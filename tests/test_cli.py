@@ -153,7 +153,7 @@ class TestCLI:
             mock_print.assert_called()
             
             # Check that quality information is printed
-            call_args = [call[0][0] for call in mock_print.call_args_list]
+            call_args = [call[0][0] if call[0] else '' for call in mock_print.call_args_list]
             printed_text = ' '.join(call_args)
             
             assert 'GIF Quality Presets' in printed_text

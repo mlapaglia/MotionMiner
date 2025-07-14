@@ -106,6 +106,9 @@ class MotionPhotoProcessor:
             jpg_files.extend(input_dir.glob(f'*{ext}'))
             jpg_files.extend(input_dir.glob(f'*{ext.upper()}'))
         
+        # Remove duplicates that can occur on case-insensitive filesystems
+        jpg_files = list(set(jpg_files))
+        
         if not jpg_files:
             print(f"No JPG files found in {input_dir}")
             return 1

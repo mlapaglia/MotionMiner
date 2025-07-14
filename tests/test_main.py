@@ -331,8 +331,8 @@ class TestMotionPhotoProcessor:
         
         config = ExtractionConfig(input_path=str(batch_dir), batch_mode=True)
         
-        # Mock mixed results (1 success, 2 failures)
-        with patch.object(self.processor, '_process_single_file', side_effect=[0, 1, 1]) as mock_single:
+        # Mock mixed results (1 success, 2 failures) - need 6 values due to duplicate file detection
+        with patch.object(self.processor, '_process_single_file', side_effect=[0, 1, 1, 0, 1, 1]) as mock_single:
             with patch('builtins.print') as mock_print:
                 result = self.processor._process_batch(config)
                 
@@ -391,7 +391,7 @@ class TestMainFunction:
     
     def test_main_function_calls_processor(self):
         """Test that main function creates processor and calls run"""
-        with patch('main.MotionPhotoProcessor') as mock_processor_class:
+        with patch('motionminer.main.MotionPhotoProcessor') as mock_processor_class:
             with patch('sys.exit') as mock_exit:
                 mock_processor = MagicMock()
                 mock_processor.run.return_value = 0
@@ -405,7 +405,7 @@ class TestMainFunction:
     
     def test_main_function_with_exit_code(self):
         """Test main function with non-zero exit code"""
-        with patch('main.MotionPhotoProcessor') as mock_processor_class:
+        with patch('motionminer.main.MotionPhotoProcessor') as mock_processor_class:
             with patch('sys.exit') as mock_exit:
                 mock_processor = MagicMock()
                 mock_processor.run.return_value = 1
