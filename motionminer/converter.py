@@ -13,7 +13,7 @@ from .config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
 class VideoConverter:
     """Handles video format conversions"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.temp_files = []
     
     def get_video_fps(self, video_path: Path) -> float:
@@ -152,7 +152,7 @@ class VideoConverter:
             print(f"✗ Simple conversion failed: {e}")
             return False
     
-    def cleanup_temp_files(self):
+    def cleanup_temp_files(self) -> None:
         """Clean up temporary files"""
         for temp_file in self.temp_files:
             if temp_file.exists():
@@ -163,6 +163,6 @@ class VideoConverter:
         
         self.temp_files.clear()
     
-    def __del__(self):
+    def __del__(self) -> None:
         """Cleanup on destruction"""
         self.cleanup_temp_files()

@@ -13,7 +13,7 @@ from .config import ExtractionConfig, GIF_QUALITY_PRESETS, DEFAULT_GIF_QUALITY, 
 class CLI:
     """Command line interface handler"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.parser = self._create_parser()
     
     def _create_parser(self) -> argparse.ArgumentParser:

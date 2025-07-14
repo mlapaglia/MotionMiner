@@ -14,7 +14,7 @@ from .converter import VideoConverter
 from .analyzer import FileAnalyzer
 
 class MotionPhotoProcessor:    
-    def __init__(self):
+    def __init__(self) -> None:
         self.cli = CLI()
         self.extractor = MotionPhotoExtractor()
         self.converter = VideoConverter()
@@ -101,7 +101,7 @@ class MotionPhotoProcessor:
         """Process multiple files in batch mode"""
         input_dir = Path(config.input_path)
         
-        jpg_files = []
+        jpg_files: List[Path] = []
         for ext in SUPPORTED_IMAGE_EXTENSIONS:
             jpg_files.extend(input_dir.glob(f'*{ext}'))
             jpg_files.extend(input_dir.glob(f'*{ext.upper()}'))
@@ -150,12 +150,12 @@ class MotionPhotoProcessor:
         
         return input_path.with_suffix(default_ext)
     
-    def _cleanup(self):
+    def _cleanup(self) -> None:
         """Clean up temporary files"""
         self.extractor.cleanup_temp_files()
         self.converter.cleanup_temp_files()
 
-def main():
+def main() -> None:
     """Main entry point"""
     processor = MotionPhotoProcessor()
     exit_code = processor.run()
