@@ -6,7 +6,7 @@ File analysis tools for debugging Motion Photo extraction
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from config import MOTION_PHOTO_MARKERS
+from .config import MOTION_PHOTO_MARKERS
 
 class FileAnalyzer:
     """Analyzes file structure for debugging purposes"""

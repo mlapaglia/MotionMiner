@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include TESTING.md
+include requirements.txt
+include pytest.ini
+include logo.png
+recursive-include motionminer *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+prune tests
+prune .git
+prune .github 

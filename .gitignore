@@ -3,6 +3,59 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Python packaging and build artifacts
+dist/
+build/
+*.egg-info/
+.eggs/
+*.egg
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+htmlcov/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
 # User-specific files
 *.rsuser
 *.suo

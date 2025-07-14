@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-from config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
+from .config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
 
 class VideoConverter:
     """Handles video format conversions"""

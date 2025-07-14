@@ -8,7 +8,7 @@ import argparse
 from pathlib import Path
 from typing import List, Optional
 
-from config import ExtractionConfig, GIF_QUALITY_PRESETS, DEFAULT_GIF_QUALITY, DEFAULT_GIF_WIDTH
+from .config import ExtractionConfig, GIF_QUALITY_PRESETS, DEFAULT_GIF_QUALITY, DEFAULT_GIF_WIDTH
 
 class CLI:
     """Command line interface handler"""

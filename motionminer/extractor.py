@@ -8,7 +8,7 @@ import struct
 from pathlib import Path
 from typing import Tuple, Optional
 
-from config import JPEG_END_MARKER, MP4_FTYP_MARKER, SUPPORTED_IMAGE_EXTENSIONS
+from .config import JPEG_END_MARKER, MP4_FTYP_MARKER, SUPPORTED_IMAGE_EXTENSIONS
 
 class MotionPhotoExtractor:
     """Handles extraction of MP4 video from Google Motion Photos"""

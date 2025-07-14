@@ -7,11 +7,11 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
-from cli import CLI
-from extractor import MotionPhotoExtractor
-from converter import VideoConverter
-from analyzer import FileAnalyzer
+from .config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
+from .cli import CLI
+from .extractor import MotionPhotoExtractor
+from .converter import VideoConverter
+from .analyzer import FileAnalyzer
 
 class MotionPhotoProcessor:    
     def __init__(self):
