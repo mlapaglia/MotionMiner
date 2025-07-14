@@ -7,8 +7,7 @@ name = "motionminer"
 dynamic = ["version"]
 description = "Extract videos from Google Motion Photos with ease!"
 readme = "README.md"
-license = {text = "MIT"}
-license-files = ["LICENSE"]
+license = {file = "LICENSE"}
 authors = [
     {name = "MotionMiner Team", email = "contact@motionminer.dev"}
 ]
