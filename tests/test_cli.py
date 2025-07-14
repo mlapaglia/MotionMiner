@@ -10,8 +10,8 @@ from pathlib import Path
 import tempfile
 import os
 
-from cli import CLI
-from config import ExtractionConfig, GIF_QUALITY_PRESETS
+from motionminer.cli import CLI
+from motionminer.config import ExtractionConfig, GIF_QUALITY_PRESETS
 
 class TestCLI:
     """Test CLI class functionality"""

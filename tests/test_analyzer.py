@@ -8,8 +8,8 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from analyzer import FileAnalyzer
-from config import MOTION_PHOTO_MARKERS, JPEG_END_MARKER, MP4_FTYP_MARKER
+from motionminer.analyzer import FileAnalyzer
+from motionminer.config import MOTION_PHOTO_MARKERS, JPEG_END_MARKER, MP4_FTYP_MARKER
 
 class TestFileAnalyzer:
     """Test FileAnalyzer class functionality"""

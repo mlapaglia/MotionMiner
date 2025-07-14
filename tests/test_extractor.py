@@ -10,8 +10,8 @@ from pathlib import Path
 from unittest.mock import patch, mock_open, MagicMock
 import struct
 
-from extractor import MotionPhotoExtractor
-from config import JPEG_END_MARKER, MP4_FTYP_MARKER, SUPPORTED_IMAGE_EXTENSIONS
+from motionminer.extractor import MotionPhotoExtractor
+from motionminer.config import JPEG_END_MARKER, MP4_FTYP_MARKER, SUPPORTED_IMAGE_EXTENSIONS
 
 class TestMotionPhotoExtractor:
     """Test MotionPhotoExtractor class functionality"""

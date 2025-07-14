@@ -10,8 +10,8 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 import subprocess
 
-from converter import VideoConverter
-from config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
+from motionminer.converter import VideoConverter
+from motionminer.config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
 
 class TestVideoConverter:
     """Test VideoConverter class functionality"""

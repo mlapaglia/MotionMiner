@@ -9,8 +9,8 @@ import struct
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-from main import MotionPhotoProcessor
-from config import ExtractionConfig, JPEG_END_MARKER, MP4_FTYP_MARKER
+from motionminer.main import MotionPhotoProcessor
+from motionminer.config import ExtractionConfig, JPEG_END_MARKER, MP4_FTYP_MARKER
 
 class TestMotionMinerIntegration:
     """Integration tests for the complete application"""

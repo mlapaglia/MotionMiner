@@ -9,8 +9,8 @@ import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 
-from main import MotionPhotoProcessor, main
-from config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
+from motionminer.main import MotionPhotoProcessor, main
+from motionminer.config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
 
 class TestMotionPhotoProcessor:
     """Test MotionPhotoProcessor class functionality"""

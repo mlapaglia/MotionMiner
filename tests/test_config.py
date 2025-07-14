@@ -4,7 +4,7 @@ Unit tests for config.py module
 """
 
 import pytest
-from config import (
+from motionminer.config import (
     GifQualitySettings, 
     ExtractionConfig, 
     GIF_QUALITY_PRESETS,
