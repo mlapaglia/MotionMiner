@@ -43,6 +43,7 @@ dev = [
     "pytest-mock>=3.10.0",
     "black>=22.0.0",
     "flake8>=4.0.0",
+    "mypy>=0.950",
 ]
 test = [
     "pytest>=7.0.0",
