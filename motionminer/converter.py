@@ -6,7 +6,7 @@ Video conversion logic for MP4 to GIF conversion
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from .config import GIF_QUALITY_PRESETS, DEFAULT_GIF_WIDTH
 
@@ -14,7 +14,7 @@ class VideoConverter:
     """Handles video format conversions"""
     
     def __init__(self) -> None:
-        self.temp_files = []
+        self.temp_files: List[Path] = []
     
     def get_video_fps(self, video_path: Path) -> float:
         """

@@ -7,10 +7,10 @@ and converts them to various formats including MP4 and GIF animations.
 """
 
 from ._version import __version__
-__author__ = "MotionMiner Team"
-__email__ = "contact@motionminer.dev"
+__author__ = "Matt LaPaglia"
+__email__ = "matt@mattlapaglia.com"
 __description__ = "Extract videos from Google Motion Photos with ease!"
-__url__ = "https://github.com/yourusername/motionminer"
+__url__ = "https://github.com/mlapaglia/motionminer"
 
 # Main imports for the package
 from .extractor import MotionPhotoExtractor
