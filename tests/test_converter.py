@@ -82,6 +82,109 @@ class TestVideoConverter:
             
             assert fps == 25.0
     
+    def test_get_video_fps_high_framerate_warning(self):
+        """Test FPS detection with high frame rate warning (>60 FPS)"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        # Mock avg_frame_rate failing, r_frame_rate returning high FPS
+        mock_results = [
+            MagicMock(returncode=0, stdout="0/0"),  # avg_frame_rate returns 0/0
+            MagicMock(returncode=0, stdout="120.0")  # r_frame_rate returns 120 FPS
+        ]
+        
+        with patch('subprocess.run', side_effect=mock_results):
+            with patch('builtins.print') as mock_print:
+                fps = self.converter.get_video_fps(video_path)
+                
+                assert fps == 30.0  # Should be capped at 30 FPS
+                mock_print.assert_called_with("Warning: Very high frame rate detected (120.0 FPS), using 30 FPS instead")
+    
+    def test_get_video_fps_high_framerate_fractional_warning(self):
+        """Test FPS detection with high fractional frame rate warning (>60 FPS)"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        # Mock avg_frame_rate failing, r_frame_rate returning high fractional FPS
+        mock_results = [
+            MagicMock(returncode=0, stdout=""),  # avg_frame_rate empty
+            MagicMock(returncode=0, stdout="7200/100")  # r_frame_rate returns 72 FPS
+        ]
+        
+        with patch('subprocess.run', side_effect=mock_results):
+            with patch('builtins.print') as mock_print:
+                fps = self.converter.get_video_fps(video_path)
+                
+                assert fps == 30.0  # Should be capped at 30 FPS
+                mock_print.assert_called_with("Warning: Very high frame rate detected (72.0 FPS), using 30 FPS instead")
+    
+    def test_get_video_fps_fallback_to_r_frame_rate(self):
+        """Test FPS detection fallback to r_frame_rate when avg_frame_rate fails"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        # Mock avg_frame_rate failing, r_frame_rate succeeding
+        mock_results = [
+            MagicMock(returncode=0, stdout="0/0"),  # avg_frame_rate returns 0/0
+            MagicMock(returncode=0, stdout="24/1")  # r_frame_rate returns 24 FPS
+        ]
+        
+        with patch('subprocess.run', side_effect=mock_results):
+            fps = self.converter.get_video_fps(video_path)
+            
+            assert fps == 24.0
+    
+    def test_get_video_fps_fallback_r_frame_rate_high_fps(self):
+        """Test FPS detection fallback with high r_frame_rate"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        # Mock avg_frame_rate failing, r_frame_rate returning high FPS
+        mock_results = [
+            MagicMock(returncode=0, stdout=""),  # avg_frame_rate empty
+            MagicMock(returncode=0, stdout="9000/100")  # r_frame_rate returns 90 FPS
+        ]
+        
+        with patch('subprocess.run', side_effect=mock_results):
+            with patch('builtins.print') as mock_print:
+                fps = self.converter.get_video_fps(video_path)
+                
+                assert fps == 30.0  # Should be capped at 30 FPS
+                mock_print.assert_called_with("Warning: Very high frame rate detected (90.0 FPS), using 30 FPS instead")
+    
+    def test_get_video_fps_fallback_both_fail(self):
+        """Test FPS detection when both avg_frame_rate and r_frame_rate fail"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        # Mock both failing
+        mock_results = [
+            MagicMock(returncode=0, stdout="0/0"),  # avg_frame_rate returns 0/0
+            MagicMock(returncode=0, stdout="0/0")   # r_frame_rate also returns 0/0
+        ]
+        
+        with patch('subprocess.run', side_effect=mock_results):
+            with patch('builtins.print') as mock_print:
+                fps = self.converter.get_video_fps(video_path)
+                
+                assert fps == 30.0  # Should default to 30 FPS
+                mock_print.assert_called_with("Warning: Could not detect valid FPS, using default 30 FPS")
+    
+    def test_get_video_fps_zero_denominator(self):
+        """Test FPS detection with zero denominator in fraction"""
+        video_path = Path(self.temp_dir) / 'test.mp4'
+        video_path.touch()
+        
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        mock_result.stdout = "30/0"  # Zero denominator
+        
+        with patch('subprocess.run', return_value=mock_result):
+            with patch('builtins.print') as mock_print:
+                fps = self.converter.get_video_fps(video_path)
+                
+                assert fps == 30.0  # Should default to 30 FPS
+    
     def test_get_video_fps_ffprobe_error(self):
         """Test FPS detection with ffprobe error"""
         video_path = Path(self.temp_dir) / 'test.mp4'
@@ -125,6 +228,46 @@ class TestVideoConverter:
                 
                 assert fps == 30.0  # Should default to 30 FPS
                 mock_print.assert_called()
+    
+    def test_cleanup_empty_file_removes_empty_file(self):
+        """Test _cleanup_empty_file removes empty files"""
+        empty_file = Path(self.temp_dir) / 'empty.gif'
+        empty_file.touch()  # Create empty file
+        
+        with patch('builtins.print') as mock_print:
+            self.converter._cleanup_empty_file(empty_file)
+            
+            assert not empty_file.exists()
+            mock_print.assert_called_with(f"Removed empty file: {empty_file}")
+    
+    def test_cleanup_empty_file_keeps_nonempty_file(self):
+        """Test _cleanup_empty_file keeps non-empty files"""
+        nonempty_file = Path(self.temp_dir) / 'nonempty.gif'
+        nonempty_file.write_bytes(b'GIF89a content')
+        
+        self.converter._cleanup_empty_file(nonempty_file)
+        
+        assert nonempty_file.exists()
+        assert nonempty_file.stat().st_size > 0
+    
+    def test_cleanup_empty_file_nonexistent(self):
+        """Test _cleanup_empty_file with nonexistent file"""
+        nonexistent_file = Path(self.temp_dir) / 'nonexistent.gif'
+        
+        # Should not raise error
+        self.converter._cleanup_empty_file(nonexistent_file)
+    
+    def test_cleanup_empty_file_exception(self):
+        """Test _cleanup_empty_file with exception during size check"""
+        test_file = Path(self.temp_dir) / 'test.gif'
+        test_file.touch()
+        
+        with patch('os.path.getsize', side_effect=OSError("Access denied")):
+            with patch('builtins.print') as mock_print:
+                self.converter._cleanup_empty_file(test_file)
+                
+                mock_print.assert_called()
+                assert "Warning: Could not check/remove empty file" in str(mock_print.call_args)
     
     def test_convert_mp4_to_gif_success(self):
         """Test successful MP4 to GIF conversion"""
@@ -290,8 +433,11 @@ class TestVideoConverter:
         mp4_path.touch()
         
         with patch.object(self.converter, 'convert_mp4_to_gif', return_value=True):
-            result = self.converter.convert_with_fallback(mp4_path, gif_path)
-            assert result is True
+            with patch.object(self.converter, '_cleanup_empty_file') as mock_cleanup:
+                result = self.converter.convert_with_fallback(mp4_path, gif_path)
+                
+                assert result is True
+                mock_cleanup.assert_called_once_with(gif_path)
     
     def test_convert_with_fallback_success_second_attempt(self):
         """Test convert_with_fallback succeeds on fallback attempt"""
@@ -315,6 +461,29 @@ class TestVideoConverter:
                         assert result is True
                         mock_print.assert_called()
     
+    def test_convert_with_fallback_simple_conversion_empty_file(self):
+        """Test convert_with_fallback when simple conversion creates empty file"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        
+        with patch.object(self.converter, 'convert_mp4_to_gif', return_value=False):
+            with patch('subprocess.run', return_value=mock_result):
+                with patch('builtins.print') as mock_print:
+                    with patch.object(self.converter, 'get_video_fps', return_value=30.0):
+                        with patch.object(self.converter, '_cleanup_empty_file') as mock_cleanup:
+                            # Create empty output file
+                            gif_path.touch()
+                            
+                            result = self.converter.convert_with_fallback(mp4_path, gif_path)
+                            
+                            assert result is False
+                            mock_print.assert_called()
+                            mock_cleanup.assert_called()
+    
     def test_convert_with_fallback_both_attempts_fail(self):
         """Test convert_with_fallback when both attempts fail"""
         mp4_path = Path(self.temp_dir) / 'input.mp4'
@@ -330,10 +499,12 @@ class TestVideoConverter:
             with patch('subprocess.run', return_value=mock_result):
                 with patch('builtins.print') as mock_print:
                     with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                        result = self.converter.convert_with_fallback(mp4_path, gif_path)
-                        
-                        assert result is False
-                        mock_print.assert_called()
+                        with patch.object(self.converter, '_cleanup_empty_file') as mock_cleanup:
+                            result = self.converter.convert_with_fallback(mp4_path, gif_path)
+                            
+                            assert result is False
+                            mock_print.assert_called()
+                            mock_cleanup.assert_called()
     
     def test_convert_with_fallback_exception(self):
         """Test convert_with_fallback with exception in fallback"""
@@ -345,10 +516,12 @@ class TestVideoConverter:
             with patch('subprocess.run', side_effect=Exception("Command failed")):
                 with patch('builtins.print') as mock_print:
                     with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                        result = self.converter.convert_with_fallback(mp4_path, gif_path)
-                        
-                        assert result is False
-                        mock_print.assert_called()
+                        with patch.object(self.converter, '_cleanup_empty_file') as mock_cleanup:
+                            result = self.converter.convert_with_fallback(mp4_path, gif_path)
+                            
+                            assert result is False
+                            mock_print.assert_called()
+                            mock_cleanup.assert_called()
     
     def test_cleanup_temp_files_success(self):
         """Test successful cleanup of temporary files"""
@@ -371,6 +544,7 @@ class TestVideoConverter:
     def test_cleanup_temp_files_with_errors(self):
         """Test cleanup with file removal errors"""
         temp_file = Path(self.temp_dir) / 'temp.png'
+        temp_file.touch()
         self.converter.temp_files.append(temp_file)
         
         with patch('os.remove', side_effect=OSError("Remove error")):
@@ -379,7 +553,39 @@ class TestVideoConverter:
                 
                 # Should handle error gracefully
                 assert len(self.converter.temp_files) == 0
-                # mock_print.assert_called()
+                mock_print.assert_called()
+    
+    def test_cleanup_temp_files_palette_cleanup(self):
+        """Test cleanup of palette.png file"""
+        palette_file = Path('palette.png')
+        palette_file.touch()
+        
+        try:
+            self.converter.cleanup_temp_files()
+            
+            # Palette file should be removed
+            assert not palette_file.exists()
+        finally:
+            # Cleanup in case test fails
+            if palette_file.exists():
+                palette_file.unlink()
+    
+    def test_cleanup_temp_files_palette_error(self):
+        """Test cleanup with palette file removal error"""
+        palette_file = Path('palette.png')
+        palette_file.touch()
+        
+        try:
+            with patch('os.remove', side_effect=OSError("Remove error")) as mock_remove:
+                with patch('builtins.print') as mock_print:
+                    self.converter.cleanup_temp_files()
+                    
+                    # Should handle error gracefully
+                    mock_print.assert_called()
+        finally:
+            # Cleanup in case test fails
+            if palette_file.exists():
+                palette_file.unlink()
     
     def test_cleanup_temp_files_nonexistent(self):
         """Test cleanup with nonexistent temp files"""
