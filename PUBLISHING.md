@@ -24,15 +24,6 @@ This guide explains how to publish MotionMiner to PyPI and manage releases using
      - **Workflow**: `ci-cd.yml`
    - For TestPyPI: Do the same at [Test PyPI](https://test.pypi.org/)
 
-### 2. Alternative: API Token Setup
-
-If you prefer API tokens over Trusted Publishers:
-
-1. Create API tokens on both PyPI and Test PyPI
-2. Add secrets to your GitHub repository:
-   - `PYPI_API_TOKEN`: Your PyPI API token
-   - `TEST_PYPI_API_TOKEN`: Your Test PyPI API token
-
 ## 🔄 Release Process
 
 ### GitHub Releases with Git Tags
