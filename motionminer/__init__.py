@@ -6,7 +6,12 @@ A powerful Python tool that extracts embedded MP4 videos from Google Motion Phot
 and converts them to various formats including MP4 and GIF animations.
 """
 
-from ._version import __version__
+try:
+    from importlib.metadata import version
+    __version__ = version("motionminer")
+except Exception:
+    # Fallback for development when package isn't installed
+    __version__ = "unknown"
 __author__ = "Matt LaPaglia"
 __email__ = "matt@mattlapaglia.com"
 __description__ = "Extract videos from Google Motion Photos with ease!"

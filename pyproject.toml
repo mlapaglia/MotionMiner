@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,10 +9,10 @@ description = "Extract videos from Google Motion Photos with ease!"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "MotionMiner Team", email = "matt@mattlapaglia.com"}
+    {name = "Matt LaPaglia", email = "matt@mattlapaglia.com"}
 ]
 maintainers = [
-    {name = "MotionMiner Team", email = "matt@mattlapaglia.com"}
+    {name = "Matt LaPaglia", email = "matt@mattlapaglia.com"}
 ]
 keywords = ["motion", "photo", "video", "extraction", "google", "photos", "gif", "mp4"]
 classifiers = [
@@ -63,9 +63,6 @@ motion-extract = "motionminer.main:main"
 
 [tool.setuptools.packages.find]
 include = ["motionminer*"]
-
-[tool.setuptools.dynamic]
-version = {attr = "motionminer._version.__version__"}
 
 [tool.setuptools.package-data]
 motionminer = ["py.typed"]
@@ -118,4 +115,8 @@ warn_redundant_casts = false
 warn_unused_ignores = false
 warn_no_return = false
 warn_unreachable = false
-strict_equality = false 
+strict_equality = false
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-date" 
