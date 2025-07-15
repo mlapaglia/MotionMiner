@@ -140,7 +140,7 @@ class TestVideoConverter:
             with patch('builtins.print') as mock_print:
                 with patch.object(self.converter, 'get_video_fps', return_value=30.0):
                     # Create the output GIF file to simulate successful conversion
-                    gif_path.touch()
+                    gif_path.write_bytes(b'GIF89a fake gif content')
                     
                     result = self.converter.convert_mp4_to_gif(mp4_path, gif_path)
                     
@@ -172,7 +172,7 @@ class TestVideoConverter:
         with patch('subprocess.run', return_value=mock_result) as mock_run:
             with patch('builtins.print'):
                 with patch.object(self.converter, 'get_video_fps', return_value=24.0):
-                    gif_path.touch()
+                    gif_path.write_bytes(b'GIF89a fake gif content')
                     
                     result = self.converter.convert_mp4_to_gif(
                         mp4_path, gif_path, 
@@ -201,7 +201,7 @@ class TestVideoConverter:
         with patch('subprocess.run', return_value=mock_result):
             with patch('builtins.print') as mock_print:
                 with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                    gif_path.touch()
+                    gif_path.write_bytes(b'GIF89a fake gif content')
                     
                     result = self.converter.convert_mp4_to_gif(
                         mp4_path, gif_path, 
@@ -307,8 +307,8 @@ class TestVideoConverter:
             with patch('subprocess.run', return_value=mock_result):
                 with patch('builtins.print') as mock_print:
                     with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                        # Create output file to simulate success
-                        gif_path.touch()
+                        # Create output file with content to simulate success
+                        gif_path.write_bytes(b'GIF89a fake gif content')
                         
                         result = self.converter.convert_with_fallback(mp4_path, gif_path)
                         
@@ -432,7 +432,7 @@ class TestVideoConverterQualitySettings:
             with patch('subprocess.run', return_value=mock_result) as mock_run:
                 with patch('builtins.print'):
                     with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                        gif_path.touch()
+                        gif_path.write_bytes(b'GIF89a fake gif content')
                         
                         result = self.converter.convert_mp4_to_gif(
                             mp4_path, gif_path, 
@@ -472,7 +472,7 @@ class TestVideoConverterQualitySettings:
             with patch('subprocess.run', return_value=mock_result) as mock_run:
                 with patch('builtins.print'):
                     with patch.object(self.converter, 'get_video_fps', return_value=30.0):
-                        gif_path.touch()
+                        gif_path.write_bytes(b'GIF89a fake gif content')
                         
                         result = self.converter.convert_mp4_to_gif(
                             mp4_path, gif_path, 
@@ -501,7 +501,7 @@ class TestVideoConverterQualitySettings:
         for fps in fps_values:
             with patch('subprocess.run', return_value=mock_result) as mock_run:
                 with patch('builtins.print'):
-                    gif_path.touch()
+                    gif_path.write_bytes(b'GIF89a fake gif content')
                     
                     result = self.converter.convert_mp4_to_gif(
                         mp4_path, gif_path, 
@@ -543,8 +543,8 @@ class TestVideoConverterIntegration:
         
         with patch('subprocess.run', return_value=mock_result) as mock_run:
             with patch('builtins.print'):
-                # Create output file to simulate successful conversion
-                gif_path.touch()
+                # Create output file with content to simulate successful conversion
+                gif_path.write_bytes(b'GIF89a fake gif content')
                 
                 result = self.converter.convert_with_fallback(
                     mp4_path, gif_path,
