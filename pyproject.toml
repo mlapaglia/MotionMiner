@@ -9,10 +9,10 @@ description = "Extract videos from Google Motion Photos with ease!"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "MotionMiner Team", email = "contact@motionminer.dev"}
+    {name = "MotionMiner Team", email = "matt@mattlapaglia.com"}
 ]
 maintainers = [
-    {name = "MotionMiner Team", email = "contact@motionminer.dev"}
+    {name = "MotionMiner Team", email = "matt@mattlapaglia.com"}
 ]
 keywords = ["motion", "photo", "video", "extraction", "google", "photos", "gif", "mp4"]
 classifiers = [
@@ -52,10 +52,10 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/motionminer"
-Repository = "https://github.com/yourusername/motionminer.git"
-Issues = "https://github.com/yourusername/motionminer/issues"
-Documentation = "https://github.com/yourusername/motionminer#readme"
+Homepage = "https://github.com/mlapaglia/MotionMiner"
+Repository = "https://github.com/mlapaglia/motionminer.git"
+Issues = "https://github.com/mlapaglia/motionminer/issues"
+Documentation = "https://github.com/mlapaglia/motionminer#readme"
 
 [project.scripts]
 motionminer = "motionminer.main:main"
