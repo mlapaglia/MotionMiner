@@ -1,0 +1,38 @@
+coverage:
+  ignore:
+    - "tests/*"
+    - "test_*.py"
+    - "*/test_*.py"
+    - "**/test_*.py"
+    - "**/*test*.py"
+    - "setup.py"
+    - "conftest.py"
+    - "*/conftest.py"
+  
+  round: down
+  precision: 2
+  
+  status:
+    project:
+      default:
+        target: 85%
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: true
+      loop: true
+      method: false
+      macro: false
+
+comment:
+  layout: "header,diff,flags,files,footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true 

@@ -6,6 +6,8 @@
 
 MotionMiner is a powerful Python tool that extracts embedded MP4 videos from Google Motion Photos (JPG files) and converts them to various formats including MP4 and GIF animations.
 
+[![codecov](https://codecov.io/gh/mlapaglia/MotionMiner/graph/badge.svg?token=A8F0Q5U6ZP)](https://codecov.io/gh/mlapaglia/MotionMiner)
+
 ## 🚀 Features
 
 - **Extract MP4 videos** from Google Motion Photos

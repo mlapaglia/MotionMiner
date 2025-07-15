@@ -1,97 +1,106 @@
 # Publishing Guide for MotionMiner
 
-This guide explains how to publish MotionMiner to PyPI and manage releases.
+This guide explains how to publish MotionMiner to PyPI and manage releases using automated versioning.
 
 ## 🚀 Quick Start
 
-1. **Update Version**: Update the version in `motionminer/_version.py`
-2. **Create Release**: Create a GitHub release with a tag
+1. **Create Git Tag**: Create a git tag with the version number (e.g., `v1.1.0`)
+2. **Create GitHub Release**: Create a GitHub release using the tag
 3. **Automatic Publishing**: GitHub Actions will automatically build and publish to PyPI
+
+**No manual version file updates needed!** setuptools-scm automatically generates version numbers from git tags.
 
 ## 📋 Prerequisites
 
-### 1. PyPI Account Setup
+### 1. PyPI Trusted Publisher Setup (Recommended)
 
-1. Create accounts on both:
-   - [PyPI](https://pypi.org/account/register/) (production)
-   - [Test PyPI](https://test.pypi.org/account/register/) (testing)
-
-2. Enable 2FA (Two-Factor Authentication) on both accounts
-
-3. Create API tokens:
-   - Go to Account Settings → API tokens
-   - Create a token with "Entire account" scope
-   - Save the token securely (you won't be able to see it again)
-
-### 2. GitHub Repository Setup
-
-1. Go to your GitHub repository → Settings → Secrets and variables → Actions
-
-2. Add the following secrets:
-   - `PYPI_API_TOKEN`: Your PyPI API token
-   - `TEST_PYPI_API_TOKEN`: Your Test PyPI API token
-
-3. Create environments (optional but recommended):
-   - Go to Settings → Environments
-   - Create environments named `pypi` and `test-pypi`
-   - Add the respective secrets to each environment
+1. Create a PyPI account at [PyPI](https://pypi.org/account/register/)
+2. Enable 2FA (Two-Factor Authentication)
+3. Set up Trusted Publishers:
+   - Go to your project settings on PyPI
+   - Add GitHub as a trusted publisher:
+     - **Owner**: `mlapaglia`
+     - **Repository**: `MotionMiner`
+     - **Workflow**: `ci-cd.yml`
+   - For TestPyPI: Do the same at [Test PyPI](https://test.pypi.org/)
 
 ## 🔄 Release Process
 
-### Method 1: GitHub Releases (Recommended)
+### GitHub Releases with Git Tags
 
-1. **Update Version**:
+1. **Create and Push Git Tag**:
    ```bash
-   # Edit motionminer/_version.py
-   __version__ = "1.1.0"
+   # Create a new tag for the version
+   git tag v1.1.0
+   
+   # Push the tag to GitHub
+   git push origin v1.1.0
    ```
 
-2. **Commit Changes**:
-   ```bash
-   git add motionminer/_version.py
-   git commit -m "Bump version to 1.1.0"
-   git push origin main
-   ```
-
-3. **Create Release**:
+2. **Create GitHub Release**:
    - Go to GitHub → Releases → Create a new release
-   - Create a new tag: `v1.1.0`
+   - Select the tag you just created: `v1.1.0`
    - Release title: `Release v1.1.0`
    - Add release notes describing changes
    - Click "Publish release"
 
-4. **Automatic Publishing**:
+3. **Automatic Publishing**:
    - GitHub Actions will automatically:
      - Run tests on multiple Python versions
-     - Build the package
+     - Build the package with version `1.1.0` (from the git tag)
      - Publish to PyPI
 
-### Method 2: Manual Publishing
+## 🤖 Automated Version Management
 
-1. **Install build tools**:
-   ```bash
-   pip install build twine
-   ```
+### How It Works
 
-2. **Build the package**:
-   ```bash
-   python -m build
-   ```
+MotionMiner uses **setuptools-scm** for automated version management:
 
-3. **Upload to Test PyPI first**:
-   ```bash
-   twine upload --repository testpypi dist/*
-   ```
+- **Git Tags** → **Package Versions**
+- `v1.0.0` → `1.0.0`
+- `v1.1.0` → `1.1.0`
+- `v2.0.0a1` → `2.0.0a1` (pre-release)
 
-4. **Test the package**:
-   ```bash
-   pip install --index-url https://test.pypi.org/simple/ motionminer
-   ```
+### Version Generation
 
-5. **Upload to production PyPI**:
-   ```bash
-   twine upload dist/*
-   ```
+```bash
+# Tagged commit
+git tag v1.1.0  → Package version: 1.1.0
+
+# Commits after tag (development)
+# → Package version: 1.1.0.dev5+g1234567.d20250715
+```
+
+### Pre-releases
+
+For pre-releases, use semantic versioning pre-release identifiers:
+
+```bash
+# Alpha release
+git tag v1.1.0a1  → Package version: 1.1.0a1
+
+# Beta release  
+git tag v1.1.0b1  → Package version: 1.1.0b1
+
+# Release candidate
+git tag v1.1.0rc1  → Package version: 1.1.0rc1
+```
+
+## 📝 Version Management
+
+### Semantic Versioning
+
+Follow [SemVer](https://semver.org/) guidelines for git tags:
+
+- **MAJOR**: `v2.0.0` - Incompatible API changes
+- **MINOR**: `v1.1.0` - New functionality (backward compatible)
+- **PATCH**: `v1.0.1` - Bug fixes (backward compatible)
+
+### No Manual Version Files
+
+**✅ Automated**: setuptools-scm reads git tags  
+**❌ Manual**: No more editing `_version.py` files  
+**✅ Consistent**: Version is always in sync with git tags
 
 ## 🧪 Testing Before Release
 
@@ -115,12 +124,11 @@ python -m build
 pip install dist/motionminer-*.whl
 ```
 
-### 2. Test PyPI
+### 2. Test PyPI (Automatic)
+
+The workflow automatically publishes to TestPyPI on main branch pushes for testing:
 
 ```bash
-# Upload to Test PyPI
-twine upload --repository testpypi dist/*
-
 # Install from Test PyPI
 pip install --index-url https://test.pypi.org/simple/ motionminer
 
@@ -132,54 +140,43 @@ motionminer --help
 
 ### pyproject.toml
 
-The main configuration file for the package. Key sections:
+Key sections for automated versioning:
 
-- `[project]`: Package metadata
-- `[project.scripts]`: Console script entry points
-- `[tool.setuptools]`: Package discovery and data files
-- `[tool.pytest.ini_options]`: Test configuration
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
+
+[project]
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-date"
+```
 
 ### GitHub Actions Workflow
 
 Located at `.github/workflows/ci-cd.yml`:
 
 - **Test Job**: Runs on multiple OS and Python versions
-- **Build Job**: Creates distribution packages
-- **Publish Job**: Uploads to PyPI on release
-- **Publish-Test Job**: Uploads to Test PyPI for pre-releases
-
-## 📝 Version Management
-
-### Semantic Versioning
-
-Follow [SemVer](https://semver.org/) guidelines:
-
-- **MAJOR**: Incompatible API changes
-- **MINOR**: New functionality (backward compatible)
-- **PATCH**: Bug fixes (backward compatible)
-
-### Version File
-
-Update `motionminer/_version.py`:
-
-```python
-__version__ = "1.2.3"
-```
+- **Build Job**: Creates distribution packages (triggered on releases and main pushes)
+- **Test-Publish Job**: Uploads to TestPyPI (main branch pushes)
+- **Publish Job**: Uploads to PyPI (all releases)
 
 ## 🚦 Release Checklist
 
 ### Before Release
 
-- [ ] Update version in `motionminer/_version.py`
-- [ ] Update CHANGELOG.md (if you have one)
 - [ ] Run full test suite: `pytest tests/`
 - [ ] Check linting: `flake8 motionminer/`
 - [ ] Test build: `python -m build`
 - [ ] Test installation: `pip install dist/motionminer-*.whl`
 - [ ] Test CLI: `motionminer --help`
+- [ ] Update CHANGELOG.md (if you have one)
 
 ### During Release
 
+- [ ] Create and push git tag: `git tag v1.1.0 && git push origin v1.1.0`
 - [ ] Create GitHub release with proper tag
 - [ ] Add comprehensive release notes
 - [ ] Monitor GitHub Actions for successful build
@@ -195,30 +192,40 @@ __version__ = "1.2.3"
 
 ### Common Issues
 
-1. **Build Failures**:
+1. **Version Not Updating**:
+   - Ensure git tag is pushed: `git push origin v1.1.0`
+   - Check tag format: Use `v1.1.0` not `1.1.0`
+   - Verify setuptools-scm is installed in build environment
+
+2. **Build Failures**:
    - Check import statements are correct
    - Verify all dependencies are listed in `pyproject.toml`
-   - Ensure all files are included in `MANIFEST.in`
+   - Ensure all files are included in package
 
-2. **PyPI Upload Failures**:
-   - Check API token is valid and has correct permissions
+3. **PyPI Upload Failures**:
+   - Check Trusted Publisher setup is correct
    - Verify package name isn't already taken
    - Ensure version number is higher than existing releases
 
-3. **GitHub Actions Failures**:
-   - Check secrets are correctly set
+4. **GitHub Actions Failures**:
+   - Check secrets are correctly set (if using API tokens)
    - Verify workflow file syntax
    - Review action logs for specific errors
 
-### Getting Help
+### Version Debugging
 
-- Check the [Python Packaging Guide](https://packaging.python.org/)
-- Review [PyPI Help](https://pypi.org/help/)
-- Check GitHub Actions [documentation](https://docs.github.com/en/actions)
+```bash
+# Check current version
+python -c "import motionminer; print(motionminer.__version__)"
+
+# Check what setuptools-scm would generate
+python -m setuptools_scm
+```
 
 ## 📚 Additional Resources
 
-- [Python Packaging Tutorial](https://packaging.python.org/tutorials/packaging-projects/)
-- [setuptools Documentation](https://setuptools.pypa.io/)
-- [GitHub Actions for Python](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python)
-- [PyPI Publishing with GitHub Actions](https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/) 
+- [setuptools-scm Documentation](https://setuptools-scm.readthedocs.io/)
+- [Semantic Versioning](https://semver.org/)
+- [Python Packaging Guide](https://packaging.python.org/)
+- [PyPI Trusted Publishers](https://docs.pypi.org/trusted-publishers/)
+- [GitHub Actions for Python](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python) 
