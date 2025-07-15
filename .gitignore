@@ -22,6 +22,7 @@ __pycache__/
 .coverage
 .coverage.*
 coverage.xml
+junit.xml
 *.cover
 .hypothesis/
 .tox/
