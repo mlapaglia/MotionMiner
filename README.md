@@ -23,10 +23,18 @@ MotionMiner is a powerful Python tool that extracts embedded MP4 videos from Goo
 
 ## 🛠️ Installation
 
-### Step 1: Install Python Dependencies
+### Method 1: Install from PyPI (Recommended)
 
 ```bash
-pip install -r requirements.txt
+pip install motionminer
+```
+
+### Method 2: Install from Source
+
+```bash
+git clone https://github.com/yourusername/motionminer.git
+cd motionminer
+pip install -e .
 ```
 
 ### Step 2: Install FFmpeg
@@ -67,7 +75,12 @@ sudo dnf install ffmpeg
 
 Test that everything is working:
 ```bash
-python main.py --help
+motionminer --help
+```
+
+Or use the alternative command:
+```bash
+motion-extract --help
 ```
 
 ## 🎯 Usage
@@ -76,25 +89,25 @@ python main.py --help
 
 Extract MP4 from a single Motion Photo:
 ```bash
-python main.py photo.jpg
+motionminer photo.jpg
 ```
 
 Extract as GIF animation:
 ```bash
-python main.py photo.jpg --gif
+motionminer photo.jpg --gif
 ```
 
 Extract both MP4 and GIF:
 ```bash
-python main.py photo.jpg --both
+motionminer photo.jpg --both
 ```
 
 ### Output Options
 
 Specify custom output filename:
 ```bash
-python main.py photo.jpg -o my_video.mp4
-python main.py photo.jpg -o my_animation.gif --gif
+motionminer photo.jpg -o my_video.mp4
+motionminer photo.jpg -o my_animation.gif --gif
 ```
 
 ### GIF Quality Settings
@@ -110,39 +123,39 @@ MotionMiner offers 4 quality presets for GIF output:
 
 Examples:
 ```bash
-python main.py photo.jpg --gif-tiny      # Small file size
-python main.py photo.jpg --gif-high      # Best quality
+motionminer photo.jpg --gif-tiny      # Small file size
+motionminer photo.jpg --gif-high      # Best quality
 ```
 
 ### Custom GIF Width
 
 Adjust GIF width (height is automatically calculated):
 ```bash
-python main.py photo.jpg --gif --gif-width 640
+motionminer photo.jpg --gif --gif-width 640
 ```
 
 ### Batch Processing
 
 Process all JPG files in a directory:
 ```bash
-python main.py photos/ --batch
+motionminer photos/ --batch
 ```
 
 Batch process with custom output directory:
 ```bash
-python main.py photos/ --batch --batch-output extracted_videos/
+motionminer photos/ --batch --batch-output extracted_videos/
 ```
 
 Batch convert to GIFs:
 ```bash
-python main.py photos/ --batch --gif-low
+motionminer photos/ --batch --gif-low
 ```
 
 ### File Analysis
 
 Analyze Motion Photo structure without extracting:
 ```bash
-python main.py photo.jpg --analyze
+motionminer photo.jpg --analyze
 ```
 
 ## 📖 Command Reference
@@ -169,31 +182,31 @@ python main.py photo.jpg --analyze
 ### Single File Examples
 ```bash
 # Extract MP4 from Motion Photo
-python main.py IMG_20231201_123456.jpg
+motionminer IMG_20231201_123456.jpg
 
 # Extract high-quality GIF
-python main.py IMG_20231201_123456.jpg --gif-high
+motionminer IMG_20231201_123456.jpg --gif-high
 
 # Extract both formats with custom output
-python main.py motion_photo.jpg --both -o my_video.mp4
+motionminer motion_photo.jpg --both -o my_video.mp4
 
 # Analyze file structure
-python main.py motion_photo.jpg --analyze
+motionminer motion_photo.jpg --analyze
 ```
 
 ### Batch Processing Examples
 ```bash
 # Process all photos in current directory
-python main.py . --batch
+motionminer . --batch
 
 # Process photos and save to specific directory
-python main.py photos/ --batch --batch-output extracted/
+motionminer photos/ --batch --batch-output extracted/
 
 # Batch convert to tiny GIFs for web use
-python main.py photos/ --batch --gif-tiny --batch-output web_gifs/
+motionminer photos/ --batch --gif-tiny --batch-output web_gifs/
 
 # Process with custom GIF settings
-python main.py photos/ --batch --gif --gif-width 320 --batch-output small_gifs/
+motionminer photos/ --batch --gif --gif-width 320 --batch-output small_gifs/
 ```
 
 ## 🔧 Troubleshooting
@@ -217,21 +230,25 @@ python main.py photos/ --batch --gif --gif-width 320 --batch-output small_gifs/
 
 View all available options:
 ```bash
-python main.py --help
+motionminer --help
 ```
 
 ## 📁 Project Structure
 
 ```
 MotionMiner/
-├── main.py          # Main application entry point
-├── cli.py           # Command-line interface
-├── extractor.py     # Motion Photo extraction logic
-├── converter.py     # Video conversion utilities
-├── analyzer.py      # File structure analysis
-├── config.py        # Configuration and settings
-├── requirements.txt # Python dependencies
-└── README.md        # This file
+├── motionminer/        # Main package directory
+│   ├── __init__.py     # Package initialization
+│   ├── main.py         # Main application entry point
+│   ├── cli.py          # Command-line interface
+│   ├── extractor.py    # Motion Photo extraction logic
+│   ├── converter.py    # Video conversion utilities
+│   ├── analyzer.py     # File structure analysis
+│   └── config.py       # Configuration and settings
+├── tests/              # Test suite
+├── pyproject.toml      # Package configuration
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
 ```
 
 ## 🤝 Contributing

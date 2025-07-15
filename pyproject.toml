@@ -1,0 +1,122 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "motionminer"
+dynamic = ["version"]
+description = "Extract videos from Google Motion Photos with ease!"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Matt LaPaglia", email = "matt@mattlapaglia.com"}
+]
+maintainers = [
+    {name = "Matt LaPaglia", email = "matt@mattlapaglia.com"}
+]
+keywords = ["motion", "photo", "video", "extraction", "google", "photos", "gif", "mp4"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Developers",
+    "Topic :: Multimedia :: Video :: Conversion",
+    "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "ffmpeg-python>=0.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mlapaglia/MotionMiner"
+Repository = "https://github.com/mlapaglia/motionminer.git"
+Issues = "https://github.com/mlapaglia/motionminer/issues"
+Documentation = "https://github.com/mlapaglia/motionminer#readme"
+
+[project.scripts]
+motionminer = "motionminer.main:main"
+motion-extract = "motionminer.main:main"
+
+[tool.setuptools.packages.find]
+include = ["motionminer*"]
+
+[tool.setuptools.package-data]
+motionminer = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=motionminer",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-branch",
+    "-v"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = false
+warn_unused_ignores = false
+warn_no_return = false
+warn_unreachable = false
+strict_equality = false
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-date" 

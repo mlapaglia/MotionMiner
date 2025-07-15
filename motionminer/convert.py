@@ -177,51 +177,6 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
     except Exception as e:
         print(f"✗ Error: {e}")
         return False
-    """
-    Extract MP4 video from Google Motion Photo JPG
-    """
-    jpg_path = Path(jpg_path)
-    
-    if not jpg_path.exists():
-        print(f"✗ File not found: {jpg_path}")
-        return False
-    
-    if jpg_path.suffix.lower() not in ['.jpg', '.jpeg']:
-        print(f"✗ Not a JPG file: {jpg_path}")
-        return False
-    
-    print(f"Processing: {jpg_path}")
-    
-    # Find embedded MP4
-    mp4_start, mp4_size = find_mp4_in_jpg(jpg_path)
-    
-    if mp4_start is None:
-        print("✗ No embedded MP4 video found in this JPG")
-        print("  This might not be a Google Motion Photo, or the format is different")
-        return False
-    
-    # Set output path if not provided
-    if output_path is None:
-        output_path = jpg_path.with_suffix('.mp4')
-    
-    try:
-        # Extract the MP4 data
-        with open(jpg_path, 'rb') as f:
-            f.seek(mp4_start)
-            mp4_data = f.read(mp4_size)
-        
-        # Write MP4 file
-        with open(output_path, 'wb') as f:
-            f.write(mp4_data)
-        
-        print(f"✓ Extracted MP4 video: {output_path}")
-        print(f"  Video size: {mp4_size:,} bytes")
-        
-        return True
-        
-    except Exception as e:
-        print(f"✗ Error extracting MP4: {e}")
-        return False
 
 def extract_mp4_from_jpg(jpg_path, output_path=None, output_format='mp4', gif_quality='medium'):
     """

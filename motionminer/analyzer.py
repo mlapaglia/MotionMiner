@@ -4,18 +4,18 @@ File analysis tools for debugging Motion Photo extraction
 """
 
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
-from config import MOTION_PHOTO_MARKERS
+from .config import MOTION_PHOTO_MARKERS
 
 class FileAnalyzer:
     """Analyzes file structure for debugging purposes"""
     
-    def analyze_jpg_structure(self, jpg_path: Path) -> Dict:
+    def analyze_jpg_structure(self, jpg_path: Path) -> Dict[str, Any]:
         """
         Analyze the structure of a JPG file to help debug Motion Photo extraction
         """
-        analysis = {
+        analysis: Dict[str, Any] = {
             'file_path': str(jpg_path),
             'file_size': 0,
             'markers_found': {},
@@ -53,7 +53,7 @@ class FileAnalyzer:
                     start = max(0, pos - 10)
                     end = min(len(data), pos + len(marker) + 10)
                     context = data[start:end]
-                    print(f"    Context: {context}")
+                    print(f"    Context: {context!r}")
                     
                     if marker in MOTION_PHOTO_MARKERS:
                         analysis['has_motion_photo_markers'] = True
@@ -96,7 +96,7 @@ class FileAnalyzer:
             start = pos + 1
         return positions
     
-    def _analyze_file_sections(self, data: bytes, analysis: Dict):
+    def _analyze_file_sections(self, data: bytes, analysis: Dict[str, Any]) -> None:
         """Analyze different sections of the file"""
         jpeg_start = data.find(b'\xff\xd8')
         jpeg_end = data.find(b'\xff\xd9')
@@ -121,7 +121,7 @@ class FileAnalyzer:
                         mp4_size = len(data) - mp4_start
                         print(f"  Estimated MP4 size: {mp4_size:,} bytes")
     
-    def print_summary(self, analysis: Dict):
+    def print_summary(self, analysis: Dict[str, Any]) -> None:
         """Print a summary of the analysis"""
         print("\n" + "="*50)
         print("ANALYSIS SUMMARY")

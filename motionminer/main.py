@@ -7,14 +7,14 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-from config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
-from cli import CLI
-from extractor import MotionPhotoExtractor
-from converter import VideoConverter
-from analyzer import FileAnalyzer
+from .config import ExtractionConfig, SUPPORTED_IMAGE_EXTENSIONS
+from .cli import CLI
+from .extractor import MotionPhotoExtractor
+from .converter import VideoConverter
+from .analyzer import FileAnalyzer
 
 class MotionPhotoProcessor:    
-    def __init__(self):
+    def __init__(self) -> None:
         self.cli = CLI()
         self.extractor = MotionPhotoExtractor()
         self.converter = VideoConverter()
@@ -101,10 +101,13 @@ class MotionPhotoProcessor:
         """Process multiple files in batch mode"""
         input_dir = Path(config.input_path)
         
-        jpg_files = []
+        jpg_files: List[Path] = []
         for ext in SUPPORTED_IMAGE_EXTENSIONS:
             jpg_files.extend(input_dir.glob(f'*{ext}'))
             jpg_files.extend(input_dir.glob(f'*{ext.upper()}'))
+        
+        # Remove duplicates that can occur on case-insensitive filesystems
+        jpg_files = list(set(jpg_files))
         
         if not jpg_files:
             print(f"No JPG files found in {input_dir}")
@@ -150,12 +153,12 @@ class MotionPhotoProcessor:
         
         return input_path.with_suffix(default_ext)
     
-    def _cleanup(self):
+    def _cleanup(self) -> None:
         """Clean up temporary files"""
         self.extractor.cleanup_temp_files()
         self.converter.cleanup_temp_files()
 
-def main():
+def main() -> None:
     """Main entry point"""
     processor = MotionPhotoProcessor()
     exit_code = processor.run()
