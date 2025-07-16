@@ -86,9 +86,12 @@ class VideoConverter:
     def convert_mp4_to_gif(self, mp4_path: Path, gif_path: Path, 
                           fps: Optional[float] = None, 
                           width: int = DEFAULT_GIF_WIDTH, 
-                          quality: str = 'medium') -> bool:
+                          quality: str = 'medium',
+                          gif_loop: bool = True) -> bool:
         """
         Convert MP4 video to GIF using ffmpeg with optimization
+        Args:
+            gif_loop: If True, GIF will loop infinitely. If False, GIF will play once.
         """
         try:
             if fps is None:
@@ -123,10 +126,12 @@ class VideoConverter:
                 return False
             
             # Step 2: Create GIF with optimized palette
+            loop_value = 0 if gif_loop else 1  # 0 = infinite loop, 1 = play once
             gif_cmd = [
                 'ffmpeg', '-i', str(mp4_path), '-i', str(palette_path),
                 '-filter_complex', f'[0:v:0]fps={final_fps},scale={width}:-1:flags=lanczos[v];[v][1:v]paletteuse=dither={settings.dither}[out]',
                 '-map', '[out]',  # Use the filtered output stream
+                '-loop', str(loop_value),  # Control GIF looping
                 '-y', str(gif_path)
             ]
             
@@ -184,14 +189,15 @@ class VideoConverter:
     def convert_with_fallback(self, mp4_path: Path, gif_path: Path, 
                              fps: Optional[float] = None, 
                              width: int = DEFAULT_GIF_WIDTH, 
-                             quality: str = 'medium') -> bool:
+                             quality: str = 'medium',
+                             gif_loop: bool = True) -> bool:
         """
         Convert MP4 to GIF with fallback to simple conversion if optimized fails
         """
         # Clean up any existing empty GIF file
         self._cleanup_empty_file(gif_path)
         
-        if self.convert_mp4_to_gif(mp4_path, gif_path, fps, width, quality):
+        if self.convert_mp4_to_gif(mp4_path, gif_path, fps, width, quality, gif_loop):
             return True
         
         print("Optimized conversion failed, trying simple conversion...")
@@ -201,10 +207,12 @@ class VideoConverter:
                 fps = self.get_video_fps(mp4_path)
             
             # Simple conversion with explicit stream selection
+            loop_value = 0 if gif_loop else 1  # 0 = infinite loop, 1 = play once
             cmd = [
                 'ffmpeg', '-i', str(mp4_path),
                 '-vf', f'fps={fps},scale={width}:-1:flags=lanczos',
                 '-map', '0:v:0',  # Explicitly select the first video stream
+                '-loop', str(loop_value),  # Control GIF looping
                 '-y', str(gif_path)
             ]
             

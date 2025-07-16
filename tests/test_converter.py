@@ -426,6 +426,56 @@ class TestVideoConverter:
                     assert result is False
                     mock_print.assert_called()
     
+    def test_convert_mp4_to_gif_loop_enabled(self):
+        """Test GIF conversion with loop enabled (default)"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        
+        with patch('subprocess.run', return_value=mock_result) as mock_run:
+            with patch('builtins.print'):
+                with patch.object(self.converter, 'get_video_fps', return_value=30.0):
+                    gif_path.write_bytes(b'GIF89a fake gif content')
+                    
+                    result = self.converter.convert_mp4_to_gif(
+                        mp4_path, gif_path, gif_loop=True
+                    )
+                    
+                    assert result is True
+                    
+                    # Check that -loop 0 (infinite loop) was used
+                    gif_call = mock_run.call_args_list[1][0][0]
+                    command_str = ' '.join(gif_call)
+                    assert '-loop 0' in command_str
+    
+    def test_convert_mp4_to_gif_loop_disabled(self):
+        """Test GIF conversion with loop disabled"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        
+        with patch('subprocess.run', return_value=mock_result) as mock_run:
+            with patch('builtins.print'):
+                with patch.object(self.converter, 'get_video_fps', return_value=30.0):
+                    gif_path.write_bytes(b'GIF89a fake gif content')
+                    
+                    result = self.converter.convert_mp4_to_gif(
+                        mp4_path, gif_path, gif_loop=False
+                    )
+                    
+                    assert result is True
+                    
+                    # Check that -loop 1 (play once) was used
+                    gif_call = mock_run.call_args_list[1][0][0]
+                    command_str = ' '.join(gif_call)
+                    assert '-loop 1' in command_str
+    
     def test_convert_with_fallback_success_first_attempt(self):
         """Test convert_with_fallback succeeds on first attempt"""
         mp4_path = Path(self.temp_dir) / 'input.mp4'
@@ -522,6 +572,78 @@ class TestVideoConverter:
                             assert result is False
                             mock_print.assert_called()
                             mock_cleanup.assert_called()
+    
+    def test_convert_with_fallback_gif_loop_enabled(self):
+        """Test convert_with_fallback passes gif_loop=True correctly"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        with patch.object(self.converter, 'convert_mp4_to_gif', return_value=True) as mock_convert:
+            with patch.object(self.converter, '_cleanup_empty_file'):
+                result = self.converter.convert_with_fallback(
+                    mp4_path, gif_path, gif_loop=True
+                )
+                
+                assert result is True
+                mock_convert.assert_called_once()
+                # Check that gif_loop=True was passed
+                call_args = mock_convert.call_args
+                # Check if gif_loop is in kwargs, otherwise check positional args
+                if 'gif_loop' in call_args[1]:
+                    assert call_args[1]['gif_loop'] is True
+                else:
+                    # gif_loop is the 6th parameter (index 5)
+                    assert call_args[0][5] is True
+    
+    def test_convert_with_fallback_gif_loop_disabled(self):
+        """Test convert_with_fallback passes gif_loop=False correctly"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        with patch.object(self.converter, 'convert_mp4_to_gif', return_value=True) as mock_convert:
+            with patch.object(self.converter, '_cleanup_empty_file'):
+                result = self.converter.convert_with_fallback(
+                    mp4_path, gif_path, gif_loop=False
+                )
+                
+                assert result is True
+                mock_convert.assert_called_once()
+                # Check that gif_loop=False was passed
+                call_args = mock_convert.call_args
+                # Check if gif_loop is in kwargs, otherwise check positional args
+                if 'gif_loop' in call_args[1]:
+                    assert call_args[1]['gif_loop'] is False
+                else:
+                    # gif_loop is the 6th parameter (index 5)
+                    assert call_args[0][5] is False
+    
+    def test_convert_with_fallback_fallback_gif_loop(self):
+        """Test convert_with_fallback passes gif_loop to fallback conversion"""
+        mp4_path = Path(self.temp_dir) / 'input.mp4'
+        gif_path = Path(self.temp_dir) / 'output.gif'
+        mp4_path.touch()
+        
+        mock_result = MagicMock()
+        mock_result.returncode = 0
+        
+        with patch.object(self.converter, 'convert_mp4_to_gif', return_value=False):
+            with patch('subprocess.run', return_value=mock_result) as mock_run:
+                with patch('builtins.print'):
+                    with patch.object(self.converter, 'get_video_fps', return_value=30.0):
+                        gif_path.write_bytes(b'GIF89a fake gif content')
+                        
+                        result = self.converter.convert_with_fallback(
+                            mp4_path, gif_path, gif_loop=False
+                        )
+                        
+                        assert result is True
+                        
+                        # Check that -loop 1 (play once) was used in fallback
+                        fallback_call = mock_run.call_args_list[0][0][0]
+                        command_str = ' '.join(fallback_call)
+                        assert '-loop 1' in command_str
     
     def test_cleanup_temp_files_success(self):
         """Test successful cleanup of temporary files"""

@@ -91,7 +91,8 @@ class MotionPhotoProcessor:
             if not self.converter.convert_with_fallback(
                 mp4_source, gif_output, 
                 width=config.gif_width, 
-                quality=config.gif_quality
+                quality=config.gif_quality,
+                gif_loop=config.gif_loop
             ):
                 success = False
         

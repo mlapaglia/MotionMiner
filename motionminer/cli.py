@@ -81,6 +81,12 @@ class CLI:
         )
         
         parser.add_argument(
+            '--gif-no-loop',
+            action='store_true',
+            help='Create GIF that plays once instead of looping infinitely'
+        )
+        
+        parser.add_argument(
             '--batch',
             action='store_true',
             help='Process all JPG files in input directory'
@@ -106,6 +112,7 @@ Examples:
   %(prog)s photo.jpg                     # Extract as MP4
   %(prog)s photo.jpg --gif               # Extract as GIF (medium quality)
   %(prog)s photo.jpg --gif-tiny          # Extract as tiny GIF (~1-2MB)
+  %(prog)s photo.jpg --gif --gif-no-loop # Extract as GIF that plays once
   %(prog)s photo.jpg --both              # Extract both MP4 and GIF
   %(prog)s photo.jpg -o video.mp4        # Custom output name
   %(prog)s photos/ --batch               # Process all JPGs in directory
@@ -157,6 +164,7 @@ GIF Quality Options:
             output_format=output_format,
             gif_quality=gif_quality,
             gif_width=parsed_args.gif_width,
+            gif_loop=not parsed_args.gif_no_loop,  # True if --gif-no-loop is NOT provided
             analyze_only=parsed_args.analyze,
             batch_mode=parsed_args.batch,
             batch_output_dir=parsed_args.batch_output

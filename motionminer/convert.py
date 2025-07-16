@@ -82,10 +82,11 @@ def get_video_fps(video_path):
         print(f"Warning: Error detecting FPS ({e}), using default 30 FPS")
         return 30.0
 
-def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, quality='high'):
+def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, quality='high', gif_loop=True):
     """
     Convert MP4 video to GIF using ffmpeg with various optimization levels
     quality: 'high', 'medium', 'low', or 'tiny'
+    gif_loop: If True, GIF will loop infinitely. If False, GIF will play once.
     """
     try:
         # Auto-detect FPS if not provided
@@ -116,7 +117,8 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
             fps_multiplier = 1.0
         
         final_fps = fps * fps_multiplier
-        
+        loop_value = 0 if gif_loop else 1
+
         if optimize:
             # Step 1: Generate optimized palette
             palette_cmd = [
@@ -132,9 +134,11 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
                 return False
             
             # Step 2: Create GIF with optimized palette
+            
             gif_cmd = [
                 'ffmpeg', '-i', str(mp4_path), '-i', 'palette.png',
                 '-filter_complex', f'fps={final_fps},scale={width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither={dither}',
+                '-loop', str(loop_value),
                 '-y', str(gif_path)
             ]
             
@@ -152,6 +156,7 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
             cmd = [
                 'ffmpeg', '-i', str(mp4_path),
                 '-vf', f'fps={final_fps},scale={width}:-1:flags=lanczos',
+                '-loop', str(loop_value),
                 '-y', str(gif_path)
             ]
             
@@ -178,10 +183,11 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
         print(f"✗ Error: {e}")
         return False
 
-def extract_mp4_from_jpg(jpg_path, output_path=None, output_format='mp4', gif_quality='medium'):
+def extract_mp4_from_jpg(jpg_path, output_path=None, output_format='mp4', gif_quality='medium', gif_loop=True):
     """
     Extract MP4 video from Google Motion Photo JPG
     output_format: 'mp4', 'gif', or 'both'
+    gif_loop: If True, GIF will loop infinitely. If False, GIF will play once.
     """
     jpg_path = Path(jpg_path)
     
@@ -231,7 +237,7 @@ def extract_mp4_from_jpg(jpg_path, output_path=None, output_format='mp4', gif_qu
             
             mp4_source = temp_mp4_path if temp_mp4_path.exists() else jpg_path.with_suffix('.mp4')
             
-            if convert_mp4_to_gif(mp4_source, gif_output, quality=gif_quality):
+            if convert_mp4_to_gif(mp4_source, gif_output, quality=gif_quality, gif_loop=gif_loop):
                 print(f"✓ Saved GIF: {gif_output}")
             else:
                 success = False
@@ -292,9 +298,10 @@ def analyze_jpg_structure(jpg_path):
     except Exception as e:
         print(f"Error analyzing file: {e}")
 
-def batch_extract(input_dir, output_dir=None, output_format='mp4'):
+def batch_extract(input_dir, output_dir=None, output_format='mp4', gif_loop=True):
     """
     Extract MP4 videos from all JPG files in a directory
+    gif_loop: If True, GIF will loop infinitely. If False, GIF will play once.
     """
     input_dir = Path(input_dir)
     
@@ -320,7 +327,7 @@ def batch_extract(input_dir, output_dir=None, output_format='mp4'):
         else:
             output_path = None
         
-        if extract_mp4_from_jpg(jpg_file, output_path, output_format):
+        if extract_mp4_from_jpg(jpg_file, output_path, output_format, gif_loop=gif_loop):
             success_count += 1
         print()  # Empty line between files
     
@@ -380,13 +387,19 @@ def main():
         else:
             output_format = 'mp4'
         
-        batch_extract(input_path, output_dir, output_format)
+        gif_loop = not ('--gif-no-loop' in sys.argv)
+        batch_extract(input_path, output_dir, output_format, gif_loop)
         return
     
     # Single file extraction
     output_path = None
     output_format = 'mp4'  # default
     gif_quality = 'medium'  # default GIF quality
+    gif_loop = True  # default GIF loops infinitely
+    
+    # Check for --gif-no-loop flag
+    if '--gif-no-loop' in sys.argv:
+        gif_loop = False
     
     # Check for format flags
     if '--gif' in sys.argv:
@@ -430,7 +443,7 @@ def main():
             if output_path.lower().endswith('.gif'):
                 output_format = 'gif'
     
-    extract_mp4_from_jpg(input_path, output_path, output_format, gif_quality)
+    extract_mp4_from_jpg(input_path, output_path, output_format, gif_quality, gif_loop)
 
 if __name__ == "__main__":
     main()
