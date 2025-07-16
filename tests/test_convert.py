@@ -440,7 +440,7 @@ class TestBatchExtract(unittest.TestCase):
         with patch('builtins.print'):
             batch_extract('input_dir', output_format='gif')
             
-            mock_extract.assert_called_with(Path('test1.jpg'), None, 'gif')
+            mock_extract.assert_called_with(Path('test1.jpg'), None, 'gif', gif_loop=True)
 
 
 class TestMain(unittest.TestCase):
@@ -470,7 +470,7 @@ class TestMain(unittest.TestCase):
         """Test main function in batch mode"""
         main()
         
-        mock_batch.assert_called_once_with('input_dir', None, 'mp4')
+        mock_batch.assert_called_once_with('input_dir', None, 'mp4', True)
     
     @patch('sys.argv', ['script.py', 'input_dir', '--batch', 'output_dir', '--gif'])
     @patch('motionminer.convert.batch_extract')
@@ -478,7 +478,7 @@ class TestMain(unittest.TestCase):
         """Test main function in batch mode with output dir and GIF format"""
         main()
         
-        mock_batch.assert_called_once_with('input_dir', 'output_dir', 'gif')
+        mock_batch.assert_called_once_with('input_dir', 'output_dir', 'gif', True)
     
     @patch('sys.argv', ['script.py', 'test.jpg', '--gif'])
     @patch('motionminer.convert.extract_mp4_from_jpg')
@@ -486,7 +486,7 @@ class TestMain(unittest.TestCase):
         """Test main function in GIF mode"""
         main()
         
-        mock_extract.assert_called_once_with('test.jpg', None, 'gif', 'medium')
+        mock_extract.assert_called_once_with('test.jpg', None, 'gif', 'medium', True)
     
     @patch('sys.argv', ['script.py', 'test.jpg', '--gif-tiny'])
     @patch('motionminer.convert.extract_mp4_from_jpg')
@@ -494,7 +494,7 @@ class TestMain(unittest.TestCase):
         """Test main function in GIF tiny mode"""
         main()
         
-        mock_extract.assert_called_once_with('test.jpg', None, 'gif', 'tiny')
+        mock_extract.assert_called_once_with('test.jpg', None, 'gif', 'tiny', True)
     
     @patch('sys.argv', ['script.py', 'test.jpg', '--both'])
     @patch('motionminer.convert.extract_mp4_from_jpg')
@@ -502,7 +502,7 @@ class TestMain(unittest.TestCase):
         """Test main function in both formats mode"""
         main()
         
-        mock_extract.assert_called_once_with('test.jpg', None, 'both', 'medium')
+        mock_extract.assert_called_once_with('test.jpg', None, 'both', 'medium', True)
     
     @patch('sys.argv', ['script.py', 'test.jpg', 'output.mp4'])
     @patch('motionminer.convert.extract_mp4_from_jpg')
@@ -510,7 +510,7 @@ class TestMain(unittest.TestCase):
         """Test main function with custom output filename"""
         main()
         
-        mock_extract.assert_called_once_with('test.jpg', 'output.mp4', 'mp4', 'medium')
+        mock_extract.assert_called_once_with('test.jpg', 'output.mp4', 'mp4', 'medium', True)
     
     @patch('sys.argv', ['script.py', 'test.jpg', 'output.gif'])
     @patch('motionminer.convert.extract_mp4_from_jpg')
@@ -518,7 +518,7 @@ class TestMain(unittest.TestCase):
         """Test main function with custom GIF output filename"""
         main()
         
-        mock_extract.assert_called_once_with('test.jpg', 'output.gif', 'gif', 'medium')
+        mock_extract.assert_called_once_with('test.jpg', 'output.gif', 'gif', 'medium', True)
 
 
 if __name__ == '__main__':
