@@ -136,6 +136,14 @@ Adjust GIF width (height is automatically calculated):
 motionminer photo.jpg --gif --gif-width 640
 ```
 
+### GIF Looping Control
+
+By default, GIFs loop infinitely. Use `--gif-no-loop` to create a GIF that plays once:
+```bash
+motionminer photo.jpg --gif --gif-no-loop      # GIF plays once
+motionminer photo.jpg --gif-high --gif-no-loop # High quality GIF that plays once
+```
+
 ### Batch Processing
 
 Process all JPG files in a directory:
@@ -175,6 +183,7 @@ motionminer photo.jpg --analyze
 - `--gif-medium` - Extract as medium quality GIF (192 colors, ~3-4MB)
 - `--gif-high` - Extract as high quality GIF (256 colors, ~5-7MB)
 - `--gif-width` - GIF width in pixels (default: 480)
+- `--gif-no-loop` - Create GIF that plays once instead of looping infinitely
 - `--batch` - Process all JPG files in input directory
 - `--batch-output` - Output directory for batch processing
 - `--analyze` - Analyze file structure without extracting
@@ -188,6 +197,9 @@ motionminer IMG_20231201_123456.jpg
 
 # Extract high-quality GIF
 motionminer IMG_20231201_123456.jpg --gif-high
+
+# Extract GIF that plays once (no loop)
+motionminer IMG_20231201_123456.jpg --gif --gif-no-loop
 
 # Extract both formats with custom output
 motionminer motion_photo.jpg --both -o my_video.mp4
@@ -209,6 +221,9 @@ motionminer photos/ --batch --gif-tiny --batch-output web_gifs/
 
 # Process with custom GIF settings
 motionminer photos/ --batch --gif --gif-width 320 --batch-output small_gifs/
+
+# Batch convert to non-looping GIFs
+motionminer photos/ --batch --gif-medium --gif-no-loop --batch-output single_play_gifs/
 ```
 
 ## 🔧 Troubleshooting

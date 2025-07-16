@@ -93,6 +93,29 @@ class TestCLI:
         
         assert config.gif_width == 640
     
+    def test_parse_args_gif_loop_default(self):
+        """Test default GIF loop behavior (should loop infinitely)"""
+        args = ['test.jpg', '--gif']
+        config = self.cli.parse_args(args)
+        
+        assert config.gif_loop is True
+    
+    def test_parse_args_gif_no_loop_flag(self):
+        """Test --gif-no-loop flag"""
+        args = ['test.jpg', '--gif', '--gif-no-loop']
+        config = self.cli.parse_args(args)
+        
+        assert config.gif_loop is False
+    
+    def test_parse_args_gif_no_loop_with_quality(self):
+        """Test --gif-no-loop with quality flags"""
+        args = ['test.jpg', '--gif-high', '--gif-no-loop']
+        config = self.cli.parse_args(args)
+        
+        assert config.gif_loop is False
+        assert config.gif_quality == 'high'
+        assert config.output_format == 'gif'
+    
     def test_parse_args_batch_mode(self):
         """Test --batch flag"""
         args = ['photos/', '--batch']

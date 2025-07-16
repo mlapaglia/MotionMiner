@@ -55,6 +55,7 @@ class ExtractionConfig:
     output_format: str = 'mp4'  # 'mp4', 'gif', 'both'
     gif_quality: str = 'medium'
     gif_width: int = 480
+    gif_loop: bool = True  # True = loop infinitely, False = play once
     analyze_only: bool = False
     batch_mode: bool = False
     batch_output_dir: Optional[str] = None

@@ -214,6 +214,68 @@ class TestConvertMp4ToGif(unittest.TestCase):
                 result = convert_mp4_to_gif('test.mp4', 'test.gif')
                 
                 self.assertFalse(result)
+    
+    @patch('subprocess.run')
+    @patch('os.path.exists')
+    @patch('os.remove')
+    @patch('os.path.getsize')
+    def test_convert_mp4_to_gif_loop_enabled(self, mock_getsize, mock_remove, mock_exists, mock_run):
+        """Test GIF conversion with loop enabled (default behavior)"""
+        mock_run.return_value.returncode = 0
+        mock_exists.return_value = True
+        mock_getsize.return_value = 1024 * 1024  # 1MB
+        
+        with patch('builtins.print'):
+            with patch('motionminer.convert.get_video_fps', return_value=30.0):
+                result = convert_mp4_to_gif('test.mp4', 'test.gif', gif_loop=True)
+                
+                self.assertTrue(result)
+                
+                # Check that -loop 0 (infinite loop) was used in optimized path
+                second_call = mock_run.call_args_list[1][0][0]
+                command_str = ' '.join(second_call)
+                self.assertIn('-loop 0', command_str)
+    
+    @patch('subprocess.run')
+    @patch('os.path.exists')
+    @patch('os.remove')
+    @patch('os.path.getsize')
+    def test_convert_mp4_to_gif_loop_disabled(self, mock_getsize, mock_remove, mock_exists, mock_run):
+        """Test GIF conversion with loop disabled"""
+        mock_run.return_value.returncode = 0
+        mock_exists.return_value = True
+        mock_getsize.return_value = 1024 * 1024  # 1MB
+        
+        with patch('builtins.print'):
+            with patch('motionminer.convert.get_video_fps', return_value=30.0):
+                result = convert_mp4_to_gif('test.mp4', 'test.gif', gif_loop=False)
+                
+                self.assertTrue(result)
+                
+                # Check that -loop 1 (play once) was used in optimized path
+                second_call = mock_run.call_args_list[1][0][0]
+                command_str = ' '.join(second_call)
+                self.assertIn('-loop 1', command_str)
+    
+    @patch('subprocess.run')
+    @patch('os.path.exists')
+    @patch('os.path.getsize')
+    def test_convert_mp4_to_gif_loop_disabled_simple(self, mock_getsize, mock_exists, mock_run):
+        """Test GIF conversion with loop disabled in simple mode"""
+        mock_run.return_value.returncode = 0
+        mock_exists.return_value = True
+        mock_getsize.return_value = 1024 * 1024  # 1MB
+        
+        with patch('builtins.print'):
+            with patch('motionminer.convert.get_video_fps', return_value=30.0):
+                result = convert_mp4_to_gif('test.mp4', 'test.gif', optimize=False, gif_loop=False)
+                
+                self.assertTrue(result)
+                
+                # Check that -loop 1 (play once) was used in simple path
+                call_args = mock_run.call_args_list[0][0][0]
+                command_str = ' '.join(call_args)
+                self.assertIn('-loop 1', command_str)
 
 
 class TestExtractMp4FromJpg(unittest.TestCase):
