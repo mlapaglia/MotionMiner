@@ -117,7 +117,8 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
             fps_multiplier = 1.0
         
         final_fps = fps * fps_multiplier
-        
+        loop_value = 0 if gif_loop else 1
+
         if optimize:
             # Step 1: Generate optimized palette
             palette_cmd = [
@@ -133,11 +134,11 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
                 return False
             
             # Step 2: Create GIF with optimized palette
-            loop_value = 0 if gif_loop else 1  # 0 = infinite loop, 1 = play once
+            
             gif_cmd = [
                 'ffmpeg', '-i', str(mp4_path), '-i', 'palette.png',
                 '-filter_complex', f'fps={final_fps},scale={width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither={dither}',
-                '-loop', str(loop_value),  # Control GIF looping
+                '-loop', str(loop_value),
                 '-y', str(gif_path)
             ]
             
@@ -152,11 +153,10 @@ def convert_mp4_to_gif(mp4_path, gif_path, fps=None, width=480, optimize=True, q
             if os.path.exists('palette.png'):
                 os.remove('palette.png')
         else:
-            loop_value = 0 if gif_loop else 1  # 0 = infinite loop, 1 = play once
             cmd = [
                 'ffmpeg', '-i', str(mp4_path),
                 '-vf', f'fps={final_fps},scale={width}:-1:flags=lanczos',
-                '-loop', str(loop_value),  # Control GIF looping
+                '-loop', str(loop_value),
                 '-y', str(gif_path)
             ]
             
@@ -387,7 +387,6 @@ def main():
         else:
             output_format = 'mp4'
         
-        # Check for --gif-no-loop flag for batch processing
         gif_loop = not ('--gif-no-loop' in sys.argv)
         batch_extract(input_path, output_dir, output_format, gif_loop)
         return

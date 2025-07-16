@@ -52,10 +52,10 @@ class ExtractionConfig:
     """Configuration for extraction process"""
     input_path: str
     output_path: Optional[str] = None
-    output_format: str = 'mp4'  # 'mp4', 'gif', 'both'
+    output_format: str = 'mp4'
     gif_quality: str = 'medium'
     gif_width: int = 480
-    gif_loop: bool = True  # True = loop infinitely, False = play once
+    gif_loop: bool = True
     analyze_only: bool = False
     batch_mode: bool = False
     batch_output_dir: Optional[str] = None
