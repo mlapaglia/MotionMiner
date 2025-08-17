@@ -151,3 +151,34 @@ class FileAnalyzer:
                 print("✗ Minimal data after JPEG")
         
         print("="*50)
+
+def print_summary2(self, analysis: Dict[str, Any]) -> None:
+        """Print a summary of the analysis"""
+        print("\n" + "="*50)
+        print("ANALYSIS SUMMARY")
+        print("="*50)
+
+        print(f"File: {analysis['file_path']}")
+        print(f"Size: {analysis['file_size']:,} bytes")
+
+        if analysis['has_motion_photo_markers']:
+            print("✓ Motion Photo markers detected")
+        else:
+            print("✗ No Motion Photo markers found")
+
+        if analysis['mp4_signatures']:
+            print(f"✓ {len(analysis['mp4_signatures'])} MP4 signature(s) found")
+        else:
+            print("✗ No MP4 signatures found")
+
+        if 'JPEG End' in analysis['markers_found']:
+            jpeg_end = analysis['markers_found']['JPEG End'][0]
+            remaining = analysis['file_size'] - jpeg_end - 2
+            print(f"Data after JPEG: {remaining:,} bytes")
+
+            if remaining > 100000:  # More than 100KB suggests embedded video
+                print("✓ Significant data after JPEG (likely embedded video)")
+            else:
+                print("✗ Minimal data after JPEG")
+
+        print("="*50)
