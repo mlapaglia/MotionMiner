@@ -1,0 +1,72 @@
+# Dependabot configuration for MotionMiner
+# This file configures automated dependency updates
+
+version: 2
+updates:
+  # Enable version updates for Python dependencies
+  - package-ecosystem: "pip"
+    # Look for pip files in the repository root
+    directory: "/"
+    schedule:
+      # Check for updates weekly on Monday
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    # Specify the Python requirements files to monitor
+    # Dependabot will automatically detect requirements.txt and pyproject.toml
+    open-pull-requests-limit: 10
+    # Labels to add to pull requests
+    labels:
+      - "dependencies"
+      - "python"
+    # Reviewers for dependency PRs (update with your GitHub username or team)
+    reviewers:
+      - "mlapaglia"
+    # Allow or disallow dependency updates
+    allow:
+      # Update all dependencies by default
+      - dependency-type: "all"
+    # Group related updates together in a single PR
+    groups:
+      # Group all development dependencies together
+      development-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "pytest*"
+          - "black"
+          - "flake8"
+          - "mypy"
+          - "pre-commit"
+      # Group all production dependencies together
+      production-dependencies:
+        dependency-type: "production"
+        exclude-patterns:
+          - "pytest*"
+          - "black"
+          - "flake8"
+          - "mypy"
+          - "pre-commit"
+    # Commit message customization
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates weekly
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "mlapaglia"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
