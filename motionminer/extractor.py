@@ -70,6 +70,43 @@ class MotionPhotoExtractor:
         
         return True
     
+    def extract_photo_data(self, jpg_path: Path, photo_size: int) -> Path:
+        """
+        Extract standalone photo data from JPG file and save to temporary file
+        Returns path to temporary photo file
+        """
+        temp_photo_path = jpg_path.with_suffix('.photo.temp.jpg')
+        self.temp_files.append(temp_photo_path)
+        try:
+            with open(jpg_path, 'rb') as f:
+                photo_data = f.read(photo_size)
+
+            with open(temp_photo_path, 'wb') as f:
+                f.write(photo_data)
+            
+            print(f"✓ Extracted photo data: {photo_size:,} bytes")
+            return temp_photo_path
+        
+        except Exception as e:
+            print(f"✗ Error extracting photo data: {e}")
+            raise
+
+    def save_photo_final(self, temp_photo_path: Path, final_photo_path: Path) -> bool:
+        """Move temporary standalone photo to final location"""
+        try:
+            if temp_photo_path != final_photo_path:
+                os.rename(temp_photo_path, final_photo_path)
+                # Remove from temp files list since it's now permanent
+                if temp_photo_path in self.temp_files:
+                    self.temp_files.remove(temp_photo_path)
+            
+            print(f"✓ Saved photo: {final_photo_path}")
+            return True
+            
+        except Exception as e:
+            print(f"✗ Error saving photo: {e}")
+            return False
+    
     def extract_mp4_data(self, jpg_path: Path, mp4_start: int, mp4_size: int) -> Path:
         """
         Extract MP4 data from JPG file and save to temporary file
