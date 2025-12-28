@@ -140,6 +140,8 @@ class MotionPhotoProcessor:
             
             file_config = ExtractionConfig(
                 input_path=str(jpg_file),
+                output_photo=config.output_photo,
+                output_photo_path=None,  # Will be auto-generated
                 output_path=None,  # Will be auto-generated
                 output_format=config.output_format,
                 gif_quality=config.gif_quality,
