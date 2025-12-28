@@ -33,7 +33,16 @@ class CLI:
             '-o', '--output',
             help='Output file path (optional, auto-generated if not provided)'
         )
-        
+
+        parser.add_argument(
+            '-p', '--photo',
+            default=False,
+            nargs='?',
+            metavar='PATH',
+            const=True,
+            help='Extract a standalone photo and save it to the specified PATH (PATH is optional, auto-generated if not provided)'
+        )
+
         format_group = parser.add_mutually_exclusive_group()
         format_group.add_argument(
             '--mp4',
@@ -109,15 +118,17 @@ class CLI:
         """Get examples text for help"""
         return """
 Examples:
-  %(prog)s photo.jpg                     # Extract as MP4
-  %(prog)s photo.jpg --gif               # Extract as GIF (medium quality)
-  %(prog)s photo.jpg --gif-tiny          # Extract as tiny GIF (~1-2MB)
-  %(prog)s photo.jpg --gif --gif-no-loop # Extract as GIF that plays once
-  %(prog)s photo.jpg --both              # Extract both MP4 and GIF
-  %(prog)s photo.jpg -o video.mp4        # Custom output name
-  %(prog)s photos/ --batch               # Process all JPGs in directory
-  %(prog)s photos/ --batch --gif-low     # Batch convert to low quality GIFs
-  %(prog)s photo.jpg --analyze           # Analyze file structure
+  %(prog)s photo.jpg                            # Extract as MP4
+  %(prog)s photo.jpg --gif                      # Extract as GIF (medium quality)
+  %(prog)s photo.jpg --gif-tiny                 # Extract as tiny GIF (~1-2MB)
+  %(prog)s photo.jpg --gif --gif-no-loop        # Extract as GIF that plays once
+  %(prog)s photo.jpg --both                     # Extract both MP4 and GIF
+  %(prog)s photo.jpg --both --photo             # Extract both MP4 and GIF, and a standalone photo
+  %(prog)s photo.jpg -o video.mp4               # Extract as MP4 with custom output name
+  %(prog)s photo.jpg -o video.mp4 -p photo2.jpg # Extract MP4 and standalone photo with custom output names
+  %(prog)s photos/ --batch                      # Process all JPGs in directory
+  %(prog)s photos/ --batch --gif-low            # Batch convert to low quality GIFs
+  %(prog)s photo.jpg --analyze                  # Analyze file structure
 
 GIF Quality Options:
   --gif-tiny:   Maximum compression, ~1-2MB, 64 colors, 80%% FPS
@@ -132,6 +143,13 @@ GIF Quality Options:
             args = sys.argv[1:]
         
         parsed_args = self.parser.parse_args(args)
+
+        if parsed_args.photo is False:
+            output_photo = False
+            output_photo_path = None
+        else:
+            output_photo = True
+            output_photo_path = None if parsed_args.photo is True else parsed_args.photo
         
         output_format = 'mp4'  # default
         gif_quality = DEFAULT_GIF_QUALITY
@@ -160,6 +178,8 @@ GIF Quality Options:
         
         config = ExtractionConfig(
             input_path=parsed_args.input,
+            output_photo=output_photo,
+            output_photo_path=output_photo_path,
             output_path=parsed_args.output,
             output_format=output_format,
             gif_quality=gif_quality,
