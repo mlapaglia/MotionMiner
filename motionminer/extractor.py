@@ -75,7 +75,7 @@ class MotionPhotoExtractor:
         Extract standalone photo data from JPG file and save to temporary file
         Returns path to temporary photo file
         """
-        temp_photo_path = jpg_path.with_suffix('.photo.temp.jpg')
+        temp_photo_path = jpg_path.with_suffix(f'.photo.temp{jpg_path.suffix}')  # Use same suffix as input to preserve e.g. jpg/jpeg-variance
         self.temp_files.append(temp_photo_path)
         try:
             with open(jpg_path, 'rb') as f:
