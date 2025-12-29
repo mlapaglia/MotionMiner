@@ -153,6 +153,93 @@ class TestMotionPhotoExtractor:
                 assert result == (None, None)
                 mock_print.assert_called()
     
+    def test_extract_photo_data_success(self):
+        """Test successful standalone photo data extraction"""
+        jpg_path = Path(self.temp_dir) / 'test.jpg'
+        
+        # Create test data
+        jpg_data = b'fake jpg data'
+        mp4_data = b'fake mp4 data with sufficient length'
+        full_data = jpg_data + mp4_data
+        
+        with open(jpg_path, 'wb') as f:
+            f.write(full_data)
+        
+        jpg_size = len(jpg_data)
+        mp4_size = len(mp4_data)
+        
+        with patch('builtins.print') as mock_print:
+            result = self.extractor.extract_photo_data(jpg_path, jpg_size)
+            
+            assert isinstance(result, Path)
+            assert result.exists()
+            assert result.suffix == jpg_path.suffix
+            assert result in self.extractor.temp_files
+            
+            # Verify extracted data
+            with open(result, 'rb') as f:
+                extracted_data = f.read()
+            assert extracted_data == jpg_data
+    
+    def test_extract_photo_data_file_error(self):
+        """Test standalone photo data extraction with file error"""
+        jpg_path = Path(self.temp_dir) / 'test.jpg'
+        
+        with patch('builtins.open', side_effect=IOError("File error")):
+            with patch('builtins.print') as mock_print:
+                with pytest.raises(IOError):
+                    self.extractor.extract_photo_data(jpg_path, 100)
+                mock_print.assert_called()
+    
+    def test_save_photo_final_success(self):
+        """Test successful standalone photo file saving"""
+        temp_photo = Path(self.temp_dir) / 'photo.temp.jpg'
+        final_photo = Path(self.temp_dir) / 'final.jpg'
+        
+        # Create temp file
+        with open(temp_photo, 'wb') as f:
+            f.write(b'test jpg data')
+        
+        self.extractor.temp_files.append(temp_photo)
+        
+        with patch('builtins.print') as mock_print:
+            result = self.extractor.save_photo_final(temp_photo, final_photo)
+            
+            assert result is True
+            assert final_photo.exists()
+            assert not temp_photo.exists()  # Should be moved
+            assert temp_photo not in self.extractor.temp_files
+            mock_print.assert_called()
+    
+    def test_save_photo_final_same_path(self):
+        """Test saving standalone photo with same temp and final paths"""
+        photo_path = Path(self.temp_dir) / 'same.mp4'
+        
+        with open(photo_path, 'wb') as f:
+            f.write(b'test jpg data')
+        
+        with patch('builtins.print') as mock_print:
+            result = self.extractor.save_photo_final(photo_path, photo_path)
+            
+            assert result is True
+            assert photo_path.exists()
+            mock_print.assert_called()
+    
+    def test_save_photo_final_error(self):
+        """Test standalone photo saving with file error"""
+        temp_photo = Path(self.temp_dir) / 'photo.temp.jpg'
+        final_photo = Path(self.temp_dir) / 'final.jpg'
+        
+        with open(temp_photo, 'wb') as f:
+            f.write(b'test jpg data')
+        
+        with patch('os.rename', side_effect=OSError("File error")):
+            with patch('builtins.print') as mock_print:
+                result = self.extractor.save_photo_final(temp_photo, final_photo)
+                
+                assert result is False
+                mock_print.assert_called()
+    
     def test_extract_mp4_data_success(self):
         """Test successful MP4 data extraction"""
         jpg_path = Path(self.temp_dir) / 'test.jpg'

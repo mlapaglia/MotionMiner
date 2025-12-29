@@ -48,6 +48,28 @@ class TestCLI:
         assert config.input_path == 'test.jpg'
         assert config.output_path == 'output.mp4'
         assert config.output_format == 'mp4'  # Should remain mp4
+
+    def test_parse_args_photo_without_path(self):
+        """Test --photo flag without optional PATH argument"""
+        for args in (
+            ['test.jpg', '--photo'],
+            ['test.jpg', '-p'],
+        ):
+            config = self.cli.parse_args(args)
+
+            assert config.output_photo is True
+            assert config.output_photo_path is None
+
+    def test_parse_args_photo_with_path(self):
+        """Test --photo flag with optional PATH argument"""
+        for args in (
+            ['test.jpg', '--photo', 'output.jpg'],
+            ['test.jpg', '-p', 'output.jpg'],
+        ):
+            config = self.cli.parse_args(args)
+
+            assert config.output_photo is True
+            assert config.output_photo_path == 'output.jpg'
     
     def test_parse_args_gif_output_format_detection(self):
         """Test automatic GIF format detection from output extension"""
