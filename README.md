@@ -174,7 +174,8 @@ motionminer photo.jpg --analyze
 - `input` - Input JPG file or directory containing JPG files
 
 ### Optional Arguments
-- `-o, --output` - Output file path (auto-generated if not provided)
+- `-o, --output [OUTPUT]` - Output file path (auto-generated if not provided)
+- `-p, --photo [PATH]` - Extract a standalone photo and save it to the specified PATH (PATH is optional, auto-generated if not provided)
 - `--mp4` - Extract as MP4 video (default)
 - `--gif` - Extract as GIF animation
 - `--both` - Extract both MP4 and GIF
@@ -195,14 +196,20 @@ motionminer photo.jpg --analyze
 # Extract MP4 from Motion Photo
 motionminer IMG_20231201_123456.jpg
 
+# Extract MP4 and standalone JPEG
+motionminer IMG_20231201_123456.jpg --photo
+
 # Extract high-quality GIF
 motionminer IMG_20231201_123456.jpg --gif-high
 
 # Extract GIF that plays once (no loop)
 motionminer IMG_20231201_123456.jpg --gif --gif-no-loop
 
-# Extract both formats with custom output
+# Extract both video formats with custom output
 motionminer motion_photo.jpg --both -o my_video.mp4
+
+# Extract both video formats and standalone JPEG with custom output
+motionminer motion_photo.jpg --both -o my_video.mp4 -p my_photo.jpg
 
 # Analyze file structure
 motionminer motion_photo.jpg --analyze
