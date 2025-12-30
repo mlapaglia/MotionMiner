@@ -83,7 +83,7 @@ class MotionPhotoProcessor:
         
         success = True
 
-        if config.output_photo:
+        if config.output_photo and temp_photo_path is not None:
             output_photo_path = self._get_output_photo_path(input_path, config.output_photo_path)
             if not self.extractor.save_photo_final(temp_photo_path, output_photo_path):
                 success = False
