@@ -67,6 +67,14 @@ class MotionPhotoProcessor:
             print("  This might not be a Google Motion Photo, or the format is different")
             return 1
         
+        temp_photo_path = None
+        if config.output_photo:
+            try:
+                temp_photo_path = self.extractor.extract_photo_data(input_path, photo_size=mp4_start)
+            except Exception as e:
+                print(f"✗ Failed to extract photo data: {e}")
+                return 1
+        
         try:
             temp_mp4_path = self.extractor.extract_mp4_data(input_path, mp4_start, mp4_size)
         except Exception as e:
@@ -74,6 +82,11 @@ class MotionPhotoProcessor:
             return 1
         
         success = True
+
+        if config.output_photo and temp_photo_path is not None:
+            output_photo_path = self._get_output_photo_path(input_path, config.output_photo_path)
+            if not self.extractor.save_photo_final(temp_photo_path, output_photo_path):
+                success = False
         
         if config.output_format in ['mp4', 'both']:
             mp4_output = self._get_output_path(input_path, config.output_path, '.mp4')
@@ -127,6 +140,8 @@ class MotionPhotoProcessor:
             
             file_config = ExtractionConfig(
                 input_path=str(jpg_file),
+                output_photo=config.output_photo,
+                output_photo_path=None,  # Will be auto-generated
                 output_path=None,  # Will be auto-generated
                 output_format=config.output_format,
                 gif_quality=config.gif_quality,
@@ -146,6 +161,13 @@ class MotionPhotoProcessor:
         
         print(f"\nBatch processing complete: {success_count}/{len(jpg_files)} files processed successfully")
         return 0 if success_count > 0 else 1
+    
+    def _get_output_photo_path(self, input_path: Path, output_photo_path: Optional[str]) -> Path:
+        """Get the output path for a standalone photo"""
+        if output_photo_path:
+            return Path(output_photo_path)
+        
+        return input_path.with_suffix(f'.photo{input_path.suffix}')  # Use same suffix as input to preserve e.g. jpg/jpeg-variance
     
     def _get_output_path(self, input_path: Path, output_path: Optional[str], default_ext: str) -> Path:
         """Get the output path for a file"""

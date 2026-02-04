@@ -157,7 +157,41 @@ class TestMotionPhotoProcessor:
                     assert result == 1
                     mock_print.assert_called()
     
-    def test_process_single_file_extraction_error(self):
+    def test_process_single_file_photo_extraction_error(self):
+        """Test _process_single_file with extraction error"""
+        jpg_path = Path(self.temp_dir) / 'test.jpg'
+        jpg_path.touch()
+        
+        config = ExtractionConfig(input_path=str(jpg_path), output_photo=True)
+        
+        with patch.object(self.processor.extractor, 'validate_input_file', return_value=True):
+            with patch.object(self.processor.extractor, 'find_mp4_in_jpg', return_value=(1000, 5000)):
+                with patch.object(self.processor.extractor, 'extract_photo_data', side_effect=Exception("Extraction failed")):
+                    with patch('builtins.print') as mock_print:
+                        result = self.processor._process_single_file(config)
+                        
+                        assert result == 1
+                        mock_print.assert_called()
+    
+    def test_process_single_file_photo_output_success(self):
+        """Test _process_single_file with successful MP4 output"""
+        jpg_path = Path(self.temp_dir) / 'test.jpg'
+        temp_photo_path = Path(self.temp_dir) / 'photo.temp.jpg'
+        jpg_path.touch()
+        temp_photo_path.touch()
+        
+        config = ExtractionConfig(input_path=str(jpg_path), output_photo=True)
+        
+        with patch.object(self.processor.extractor, 'validate_input_file', return_value=True):
+            with patch.object(self.processor.extractor, 'find_mp4_in_jpg', return_value=(1000, 5000)):
+                with patch.object(self.processor.extractor, 'extract_mp4_data', return_value=temp_photo_path):
+                    with patch.object(self.processor.extractor, 'save_mp4_final', return_value=True):
+                        with patch('builtins.print'):
+                            result = self.processor._process_single_file(config)
+                            
+                            assert result == 0
+    
+    def test_process_single_file_mp4_extraction_error(self):
         """Test _process_single_file with extraction error"""
         jpg_path = Path(self.temp_dir) / 'test.jpg'
         jpg_path.touch()
@@ -359,6 +393,23 @@ class TestMotionPhotoProcessor:
                 assert result == 1  # Should return 1 if no files succeeded
                 assert mock_single.call_count == 2
                 mock_print.assert_called()
+    
+    def test_get_output_photo_path_with_provided_path(self):
+        """Test _get_output_photo_path with provided output path"""
+        input_path = Path('test.jpg')
+        output_path = 'custom_output.jpg'
+        
+        result = self.processor._get_output_photo_path(input_path, output_path)
+        
+        assert result == Path(output_path)
+    
+    def test_get_output_photo_path_auto_generated(self):
+        """Test _get_output_photo_path with auto-generated path"""
+        input_path = Path('test.jpg')
+        
+        result = self.processor._get_output_photo_path(input_path, None)
+        
+        assert result == Path('test.photo.jpg')
     
     def test_get_output_path_with_provided_path(self):
         """Test _get_output_path with provided output path"""

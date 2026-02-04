@@ -51,6 +51,8 @@ GIF_QUALITY_PRESETS = {
 class ExtractionConfig:
     """Configuration for extraction process"""
     input_path: str
+    output_photo: bool = False
+    output_photo_path: Optional[str] = None
     output_path: Optional[str] = None
     output_format: str = 'mp4'
     gif_quality: str = 'medium'
