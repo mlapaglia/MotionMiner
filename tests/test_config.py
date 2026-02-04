@@ -70,6 +70,8 @@ class TestExtractionConfig:
         config = ExtractionConfig(input_path='test.jpg')
         
         assert config.input_path == 'test.jpg'
+        assert config.output_photo is False
+        assert config.output_photo_path is None
         assert config.output_path is None
         assert config.output_format == 'mp4'
         assert config.gif_quality == 'medium'
@@ -82,6 +84,8 @@ class TestExtractionConfig:
         """Test creating ExtractionConfig with all parameters"""
         config = ExtractionConfig(
             input_path='input.jpg',
+            output_photo=True,
+            output_photo_path='output.jpg',
             output_path='output.mp4',
             output_format='gif',
             gif_quality='high',
@@ -92,6 +96,8 @@ class TestExtractionConfig:
         )
         
         assert config.input_path == 'input.jpg'
+        assert config.output_photo is True
+        assert config.output_photo_path == 'output.jpg'
         assert config.output_path == 'output.mp4'
         assert config.output_format == 'gif'
         assert config.gif_quality == 'high'

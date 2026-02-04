@@ -51,6 +51,24 @@ class TestMotionMinerIntegration:
         
         return filepath
     
+    def test_complete_photo_extraction_workflow(self):
+        """Test complete standalone photo extraction from motion photo"""
+        # Create test motion photo
+        motion_photo = self.create_mock_motion_photo('test_motion.jpg')
+        output_jpg = Path(self.temp_dir) / 'output.jpg'
+        
+        args = [str(motion_photo), '-p', str(output_jpg)]
+        
+        # Mock ffmpeg calls to avoid external dependencies
+        with patch('subprocess.run') as mock_run:
+            mock_run.return_value = MagicMock(returncode=0)
+            
+            with patch('builtins.print'):
+                result = self.processor.run(args)
+        
+        assert result == 0
+        # Note: In real scenario, output_mp4 would exist after successful extraction
+    
     def test_complete_mp4_extraction_workflow(self):
         """Test complete MP4 extraction from motion photo"""
         # Create test motion photo
